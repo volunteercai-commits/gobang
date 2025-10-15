@@ -72,7 +72,7 @@ function App() {
   return (
     <div className="App">
       <div className="game-container">
-        <h1>五子棋 - React版</h1>
+        <h1>五子棋</h1>
         
         <div className="chessboard-container">
           <ChessBoard
