@@ -451,22 +451,29 @@ export class AdvancedAIEngine {
     // 决策逻辑：权衡攻击和防守
     const shouldAttack = this.shouldPrioritizeAttack(aiThreatStrength, humanThreatStrength, currentAdvantage);
     
-    console.log('🤖 AI决策分析:', {
-      aiThreats: aiThreats.length,
-      humanThreats: humanThreats.length,
-      aiThreatStrength,
-      humanThreatStrength,
-      currentAdvantage,
-      shouldAttack
-    });
+    // 只在开发环境下输出调试日志
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🤖 AI决策分析:', {
+        aiThreats: aiThreats.length,
+        humanThreats: humanThreats.length,
+        aiThreatStrength,
+        humanThreatStrength,
+        currentAdvantage,
+        shouldAttack
+      });
+    }
     
     if (shouldAttack && aiThreats.length > 0) {
       // 优先进攻：我方威胁大于敌方威胁，或者我方有明显优势
-      console.log('⚔️ 选择进攻策略');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⚔️ 选择进攻策略');
+      }
       return aiThreats[0];
     } else if (humanThreats.length > 0) {
       // 优先防守：敌方威胁较大，或者我方优势不明显
-      console.log('🛡️ 选择防守策略');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🛡️ 选择防守策略');
+      }
       return humanThreats[0];
     }
 

@@ -251,12 +251,16 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     // 防抖：防止快速重复触摸
     const now = Date.now();
     if (now - lastTouchTimeRef.current < 500) {
-      console.log('🚫 触摸防抖，忽略');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🚫 触摸防抖，忽略');
+      }
       return;
     }
     lastTouchTimeRef.current = now;
     
-    console.log('📱 触摸事件:', { timestamp: now });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📱 触摸事件:', { timestamp: now });
+    }
     
     const canvas = canvasRef.current;
     if (!canvas) return;

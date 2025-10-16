@@ -152,7 +152,9 @@ export const useGameState = () => {
     }
     lastClickTimeRef.current = now;
     
-    console.log('🖱️ 点击事件:', { row, col, timestamp: now });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🖱️ 点击事件:', { row, col, timestamp: now });
+    }
     
     setGameState(prevState => {
       if (prevState.gameEnded) return prevState;
@@ -171,20 +173,26 @@ export const useGameState = () => {
           prevState.lastClickPosition.row === row && 
           prevState.lastClickPosition.col === col;
       
-      console.log('🔄 点击检查:', { 
-        isRepeatClick, 
-        lastClickPosition: prevState.lastClickPosition,
-        currentClick: { row, col }
-      });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 点击检查:', { 
+          isRepeatClick, 
+          lastClickPosition: prevState.lastClickPosition,
+          currentClick: { row, col }
+        });
+      }
 
       if (isRepeatClick) {
         // 确认落子
-        console.log('✅ 确认落子');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ 确认落子');
+        }
         placePiece(row, col);
         return prevState;
       } else {
         // 显示预览棋子
-        console.log('👁️ 显示预览');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('👁️ 显示预览');
+        }
         return {
           ...prevState,
           lastClickPosition: { row, col },
@@ -212,7 +220,9 @@ export const useGameState = () => {
       const aiEngine = new AIDecisionEngine(prevState.board, aiPlayer, humanPlayer);
       const bestMove = aiEngine.getBestMove();
       
-      console.log('🤖 AI思考中... aiPlayer:', aiPlayer, 'humanPlayer:', humanPlayer, 'bestMove:', bestMove);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🤖 AI思考中... aiPlayer:', aiPlayer, 'humanPlayer:', humanPlayer, 'bestMove:', bestMove);
+      }
       
       if (bestMove) {
         // 直接下棋，不通过placePiece避免循环调用
@@ -285,16 +295,22 @@ export const useGameState = () => {
 
   // 监听游戏状态变化，触发AI下棋
   useEffect(() => {
-    console.log('🔄 useEffect触发 - mode:', gameState.mode, 'gameEnded:', gameState.gameEnded, 'currentPlayer:', gameState.currentPlayer, 'playerIsBlack:', gameState.playerIsBlack);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔄 useEffect触发 - mode:', gameState.mode, 'gameEnded:', gameState.gameEnded, 'currentPlayer:', gameState.currentPlayer, 'playerIsBlack:', gameState.playerIsBlack);
+    }
     
     if (gameState.mode === 'pvc' && !gameState.gameEnded) {
       const isAITurn = (gameState.playerIsBlack && gameState.currentPlayer === 'white') || 
                       (!gameState.playerIsBlack && gameState.currentPlayer === 'black');
       
-      console.log('🤖 AI回合检查 - isAITurn:', isAITurn, 'currentPlayer:', gameState.currentPlayer, 'playerIsBlack:', gameState.playerIsBlack);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🤖 AI回合检查 - isAITurn:', isAITurn, 'currentPlayer:', gameState.currentPlayer, 'playerIsBlack:', gameState.playerIsBlack);
+      }
       
       if (isAITurn) {
-        console.log('🚀 触发AI下棋...');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🚀 触发AI下棋...');
+        }
         triggerAIMove();
       }
     }
