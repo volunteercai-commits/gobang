@@ -8,6 +8,7 @@ import {
   getCenterNearMove 
 } from './gameLogic';
 import { AdvancedAIEngine } from './aiEngine';
+import { TauriAIEngine, isTauriEnvironment } from './tauriAI';
 
 // AI决策引擎 - 使用高级AI引擎
 export class AIDecisionEngine {
@@ -23,14 +24,27 @@ export class AIDecisionEngine {
     this.maxTime = maxTime;
   }
 
-  // 获取AI的最佳移动 - 使用新的高级AI引擎
-  public getBestMove(): Position | null {
+  // 获取AI的最佳移动 - 优先使用Tauri AI引擎
+  public async getBestMove(): Promise<Position | null> {
     const startTime = Date.now();
     
     // 检查超时
     const isTimeout = () => Date.now() - startTime > this.maxTime;
 
-    // 使用新的高级AI引擎
+    // 优先使用Tauri AI引擎（如果可用）
+    if (isTauriEnvironment()) {
+      try {
+        const tauriMove = await TauriAIEngine.getBestMove(this.board, this.aiPlayer, this.humanPlayer);
+        if (tauriMove && !isTimeout()) {
+          console.log('🚀 使用Tauri Rust AI引擎');
+          return tauriMove;
+        }
+      } catch (error) {
+        console.warn('Tauri AI调用失败，回退到JavaScript AI:', error);
+      }
+    }
+
+    // 回退到JavaScript AI引擎
     const bestMove = AdvancedAIEngine.getBestMove(this.board, this.aiPlayer, this.humanPlayer);
     
     // 如果超时，返回一个随机位置
