@@ -53,6 +53,25 @@ wasm_lib/pkg/
 wasm_lib/target/
 src/wasm/
 
+# 二进制文件和可执行文件
+*.dmg
+*.app
+*.exe
+*.deb
+*.rpm
+*.msi
+
+# Rust 编译中间文件
+*.rlib
+*.rmeta
+*.rlib.d
+*.rmeta.d
+
+# 大型数据文件
+*.db
+*.sqlite
+*.sqlite3
+
 # ===========================================
 # 开发工具
 # ===========================================
