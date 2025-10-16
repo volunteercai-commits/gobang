@@ -44,18 +44,18 @@ export const GameControls: React.FC<GameControlsProps> = ({
   const undoButtonState = getUndoButtonState();
 
   return (
-    <div className="game-controls">
+    <div className="game-controls" data-testid="game-controls">
       <div className="button-group">
-        <button onClick={onResetGame} className="reset-btn">
+        <button onClick={onResetGame} className="reset-btn" data-testid="reset-button">
           重置游戏
         </button>
         
-        <button onClick={onToggleMode} className="mode-btn">
+        <button onClick={onToggleMode} className="mode-btn" data-testid="mode-button">
           当前模式：{gameState.mode === 'pvp' ? '人人对战' : '人机对战'}
         </button>
         
         {gameState.mode === 'pvc' && (
-          <button onClick={onToggleFirstPlayer} className="first-player-btn">
+          <button onClick={onToggleFirstPlayer} className="first-player-btn" data-testid="first-player-button">
             先手：{gameState.playerIsBlack ? '玩家' : 'AI'}
           </button>
         )}
@@ -64,13 +64,14 @@ export const GameControls: React.FC<GameControlsProps> = ({
           onClick={onUndoMove} 
           className="undo-btn"
           disabled={undoButtonState.disabled}
+          data-testid="undo-button"
           title="悔棋规则：悔自己的棋子时会把对手最后下的棋子也拿掉。如果在对局中悔过棋，赢了也不得分，对方赢了得两分。"
         >
           {undoButtonState.text}
         </button>
         
         {gameState.mode === 'pvc' && (
-          <button onClick={onResetScores} className="reset-score-btn">
+          <button onClick={onResetScores} className="reset-score-btn" data-testid="reset-score-button">
             重置分数
           </button>
         )}

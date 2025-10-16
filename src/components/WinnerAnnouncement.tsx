@@ -29,7 +29,7 @@ export const WinnerAnnouncement: React.FC<WinnerAnnouncementProps> = ({ gameStat
   const winner = gameState.winner === 'black' ? '黑方' : '白方';
 
   return (
-    <div className="winner-announcement">
+    <div className="winner-announcement" data-testid="winner-announcement">
       🎉 {winner}胜利！ 🎉
     </div>
   );

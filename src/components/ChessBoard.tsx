@@ -274,6 +274,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   return (
     <canvas
       ref={canvasRef}
+      data-testid="chess-board"
       width={boardSize + Math.max(20, boardSize * 0.08) * 2}
       height={boardSize + Math.max(20, boardSize * 0.08) * 2}
       onClick={handleCanvasClick}
