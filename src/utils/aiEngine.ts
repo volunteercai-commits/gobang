@@ -437,21 +437,40 @@ export class AdvancedAIEngine {
       }
     }
 
-    // 3. 检查对手的威胁，优先防守
+    // 3. 优势权衡：评估攻击和防守的优先级
+    const aiThreats = this.getThreatPositions(board, aiPlayer);
     const humanThreats = this.getThreatPositions(board, humanPlayer);
-    if (humanThreats.length > 0) {
-      // 优先防守最高威胁
+    
+    // 计算双方威胁强度
+    const aiThreatStrength = this.calculateThreatStrength(aiThreats);
+    const humanThreatStrength = this.calculateThreatStrength(humanThreats);
+    
+    // 计算当前局面优势
+    const currentAdvantage = this.calculateCurrentAdvantage(board, aiPlayer, humanPlayer);
+    
+    // 决策逻辑：权衡攻击和防守
+    const shouldAttack = this.shouldPrioritizeAttack(aiThreatStrength, humanThreatStrength, currentAdvantage);
+    
+    console.log('🤖 AI决策分析:', {
+      aiThreats: aiThreats.length,
+      humanThreats: humanThreats.length,
+      aiThreatStrength,
+      humanThreatStrength,
+      currentAdvantage,
+      shouldAttack
+    });
+    
+    if (shouldAttack && aiThreats.length > 0) {
+      // 优先进攻：我方威胁大于敌方威胁，或者我方有明显优势
+      console.log('⚔️ 选择进攻策略');
+      return aiThreats[0];
+    } else if (humanThreats.length > 0) {
+      // 优先防守：敌方威胁较大，或者我方优势不明显
+      console.log('🛡️ 选择防守策略');
       return humanThreats[0];
     }
 
-    // 4. 检查AI自己的威胁，寻找进攻机会
-    const aiThreats = this.getThreatPositions(board, aiPlayer);
-    if (aiThreats.length > 0) {
-      // 优先进攻最高威胁
-      return aiThreats[0];
-    }
-
-    // 5. 使用Minimax算法进行深度搜索
+    // 4. 使用Minimax算法进行深度搜索
     const moves = this.getPossibleMoves(board);
     let bestMove: Position | null = null;
     let bestScore = -Infinity;
@@ -468,6 +487,65 @@ export class AdvancedAIEngine {
     }
 
     return bestMove;
+  }
+
+  // 计算威胁强度
+  private static calculateThreatStrength(threats: Position[]): number {
+    if (threats.length === 0) return 0;
+    
+    let totalStrength = 0;
+    for (const threat of threats) {
+      // 根据威胁级别计算强度
+      const threatLevel = (threat as any).threatLevel || 0;
+      totalStrength += threatLevel;
+    }
+    
+    return totalStrength;
+  }
+
+  // 计算当前局面优势
+  private static calculateCurrentAdvantage(board: PieceValue[][], aiPlayer: PieceValue, humanPlayer: PieceValue): number {
+    let aiScore = 0;
+    let humanScore = 0;
+    
+    // 评估每个位置的威胁
+    for (let row = 0; row < 15; row++) {
+      for (let col = 0; col < 15; col++) {
+        if (board[row][col] === aiPlayer) {
+          aiScore += this.evaluatePosition(board, row, col, aiPlayer);
+        } else if (board[row][col] === humanPlayer) {
+          humanScore += this.evaluatePosition(board, row, col, humanPlayer);
+        }
+      }
+    }
+    
+    return aiScore - humanScore;
+  }
+
+  // 判断是否应该优先进攻
+  private static shouldPrioritizeAttack(aiThreatStrength: number, humanThreatStrength: number, currentAdvantage: number): boolean {
+    // 如果我方威胁明显大于敌方威胁，优先进攻
+    if (aiThreatStrength > humanThreatStrength * 1.5) {
+      return true;
+    }
+    
+    // 如果我方有明显优势（分数差大于1000），优先进攻
+    if (currentAdvantage > 1000) {
+      return true;
+    }
+    
+    // 如果敌方威胁很小（小于500），优先进攻
+    if (humanThreatStrength < 500) {
+      return true;
+    }
+    
+    // 如果双方威胁相当，但我方优势大于500，优先进攻
+    if (Math.abs(aiThreatStrength - humanThreatStrength) < 200 && currentAdvantage > 500) {
+      return true;
+    }
+    
+    // 其他情况优先防守
+    return false;
   }
 
   // 获取开局移动
