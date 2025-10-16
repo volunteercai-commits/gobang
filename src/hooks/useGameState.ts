@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { GameState, Position, PieceColor, GameMode, Move } from '../types';
 import { initializeBoard, checkWin } from '../utils/gameLogic';
 import { AIDecisionEngine } from '../utils/aiDecision';
@@ -137,6 +137,7 @@ export const useGameState = () => {
         lastClickPosition: null,
       };
     });
+
   }, []);
 
   // 处理点击事件
@@ -177,6 +178,12 @@ export const useGameState = () => {
     setGameState(prevState => {
       if (prevState.gameEnded || prevState.mode === 'pvp') return prevState;
 
+      // 检查是否轮到AI下棋
+      const isAITurn = (prevState.playerIsBlack && prevState.currentPlayer === 'white') || 
+                      (!prevState.playerIsBlack && prevState.currentPlayer === 'black');
+      
+      if (!isAITurn) return prevState;
+
       const aiPlayer = prevState.playerIsBlack ? -1 : 1;
       const humanPlayer = prevState.playerIsBlack ? 1 : -1;
       
@@ -184,12 +191,61 @@ export const useGameState = () => {
       const bestMove = aiEngine.getBestMove();
       
       if (bestMove) {
-        placePiece(bestMove.row, bestMove.col);
+        // 直接下棋，不通过placePiece避免循环调用
+        const newBoard = prevState.board.map(row => [...row]);
+        newBoard[bestMove.row][bestMove.col] = aiPlayer;
+        
+        // 记录移动
+        const move: Move = { row: bestMove.row, col: bestMove.col, player: prevState.currentPlayer };
+        const newLastBlackMove = prevState.currentPlayer === 'black' ? move : prevState.lastBlackMove;
+        const newLastWhiteMove = prevState.currentPlayer === 'white' ? move : prevState.lastWhiteMove;
+
+        // 检查是否获胜
+        const isWin = checkWin(newBoard, bestMove.row, bestMove.col);
+        const newGameEnded = isWin;
+        const newWinner = isWin ? prevState.currentPlayer : null;
+
+        // 计算得分
+        let newPlayerScore = prevState.playerScore;
+        let newAiScore = prevState.aiScore;
+
+        if (isWin && prevState.mode === 'pvc') {
+          const aiWon = (prevState.playerIsBlack && prevState.currentPlayer === 'white') || 
+                       (!prevState.playerIsBlack && prevState.currentPlayer === 'black');
+          const aiUsedUndo = (prevState.playerIsBlack && prevState.whiteUndoUsed) || 
+                            (!prevState.playerIsBlack && prevState.blackUndoUsed);
+          
+          if (aiWon) {
+            if (aiUsedUndo) {
+              newPlayerScore += 2;
+            } else {
+              newAiScore += 1;
+            }
+          }
+        }
+
+        const newCurrentPlayer = isWin ? prevState.currentPlayer : 
+                                (prevState.currentPlayer === 'black' ? 'white' : 'black');
+
+        return {
+          ...prevState,
+          board: newBoard,
+          currentPlayer: newCurrentPlayer,
+          gameEnded: newGameEnded,
+          winner: newWinner,
+          lastBlackMove: newLastBlackMove,
+          lastWhiteMove: newLastWhiteMove,
+          playerScore: newPlayerScore,
+          aiScore: newAiScore,
+          previewPosition: null,
+          isPreviewMode: false,
+          lastClickPosition: null,
+        };
       }
       
       return prevState;
     });
-  }, [placePiece]);
+  }, []);
 
   // 触发AI下棋（延迟）
   const triggerAIMove = useCallback(() => {
@@ -202,6 +258,18 @@ export const useGameState = () => {
       aiThinkingTimeoutRef.current = null;
     }, 500);
   }, [aiMove]);
+
+  // 监听游戏状态变化，触发AI下棋
+  useEffect(() => {
+    if (gameState.mode === 'pvc' && !gameState.gameEnded) {
+      const isAITurn = (gameState.playerIsBlack && gameState.currentPlayer === 'white') || 
+                      (!gameState.playerIsBlack && gameState.currentPlayer === 'black');
+      
+      if (isAITurn) {
+        triggerAIMove();
+      }
+    }
+  }, [gameState.mode, gameState.gameEnded, gameState.currentPlayer, gameState.playerIsBlack, triggerAIMove]);
 
   // 悔棋
   const undoMove = useCallback(() => {
