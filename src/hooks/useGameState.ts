@@ -142,6 +142,8 @@ export const useGameState = () => {
 
   // 处理点击事件
   const handleCellClick = useCallback((row: number, col: number) => {
+    console.log('🖱️ 点击事件:', { row, col, timestamp: Date.now() });
+    
     setGameState(prevState => {
       if (prevState.gameEnded) return prevState;
 
@@ -155,14 +157,24 @@ export const useGameState = () => {
       if (prevState.board[row][col] !== 0) return prevState;
 
       // 检查是否是重复点击同一位置
-      if (prevState.lastClickPosition && 
+      const isRepeatClick = prevState.lastClickPosition && 
           prevState.lastClickPosition.row === row && 
-          prevState.lastClickPosition.col === col) {
+          prevState.lastClickPosition.col === col;
+      
+      console.log('🔄 点击检查:', { 
+        isRepeatClick, 
+        lastClickPosition: prevState.lastClickPosition,
+        currentClick: { row, col }
+      });
+
+      if (isRepeatClick) {
         // 确认落子
+        console.log('✅ 确认落子');
         placePiece(row, col);
         return prevState;
       } else {
         // 显示预览棋子
+        console.log('👁️ 显示预览');
         return {
           ...prevState,
           lastClickPosition: { row, col },
