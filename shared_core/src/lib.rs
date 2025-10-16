@@ -6,9 +6,10 @@ use serde::{Deserialize, Serialize};
 // 游戏常量
 pub const BOARD_SIZE: usize = 15;
 pub const WIN_LENGTH: usize = 5;
-pub const MAX_DEPTH: i32 = 4;
+pub const MAX_DEPTH: i32 = 2;  // 进一步减少搜索深度，确保3秒内完成
 pub const WIN_SCORE: i32 = 100000;
 pub const LOSE_SCORE: i32 = -100000;
+pub const MAX_MOVES: usize = 12;  // 进一步限制候选移动数量
 
 // 方向向量
 const DIRECTIONS: [(i32, i32); 4] = [
@@ -164,7 +165,7 @@ pub fn evaluate_board(board: &Vec<Vec<i32>>, player: i32) -> i32 {
     score
 }
 
-// 获取可能的移动位置
+// 获取可能的移动位置（优化版）
 pub fn get_possible_moves(board: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
     let mut moves = Vec::new();
     
@@ -196,12 +197,15 @@ pub fn get_possible_moves(board: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
         }
     }
     
-    // 为每个已有棋子周围的空位添加候选位置
+    // 为每个已有棋子周围的空位添加候选位置（缩小搜索范围）
     let mut candidate_positions = std::collections::HashSet::new();
     
     for (piece_row, piece_col) in piece_positions {
-        for dr in -2..=2 {
-            for dc in -2..=2 {
+        // 只搜索周围1格范围内的位置，减少候选数量
+        for dr in -1..=1 {
+            for dc in -1..=1 {
+                if dr == 0 && dc == 0 { continue; } // 跳过自己
+                
                 let new_row = piece_row as i32 + dr;
                 let new_col = piece_col as i32 + dc;
                 
@@ -222,6 +226,18 @@ pub fn get_possible_moves(board: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
         moves.push((row, col));
     }
     
+    // 按重要性排序并限制数量
+    if moves.len() > MAX_MOVES {
+        // 按位置价值排序，优先选择更有价值的位置
+        moves.sort_by_key(|&(row, col)| {
+            let center = 7;
+            let distance_from_center = (row as i32 - center).abs() + (col as i32 - center).abs();
+            // 距离中心越近，价值越高（分数越小）
+            distance_from_center
+        });
+        moves.truncate(MAX_MOVES);
+    }
+    
     // 如果没有找到任何移动，返回所有空位
     if moves.is_empty() {
         for row in 0..BOARD_SIZE {
@@ -236,7 +252,7 @@ pub fn get_possible_moves(board: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
     moves
 }
 
-// Minimax算法
+// Minimax算法（优化版）
 fn minimax(
     board: &mut Vec<Vec<i32>>,
     depth: i32,
@@ -250,60 +266,66 @@ fn minimax(
         return evaluate_board(board, player);
     }
     
-    // 检查获胜
-    for row in 0..BOARD_SIZE {
-        for col in 0..BOARD_SIZE {
-            if board[row][col] == 0 {
-                board[row][col] = if is_maximizing { player } else { opponent };
-                if check_win(board, row, col) {
-                    board[row][col] = 0;
-                    return if is_maximizing { WIN_SCORE } else { LOSE_SCORE };
-                }
-                board[row][col] = 0;
-            }
-        }
-    }
-    
+    // 快速检查获胜（只检查关键位置）
     let moves = get_possible_moves(board);
     if moves.is_empty() {
         return evaluate_board(board, player);
     }
     
+    // 限制搜索的移动数量，确保快速响应
+    let search_moves = if moves.len() > 6 {
+        &moves[..6]  // 只搜索前6个最佳候选位置
+    } else {
+        &moves
+    };
+    
     if is_maximizing {
         let mut max_eval = LOSE_SCORE;
         let mut alpha = alpha;
-        for (row, col) in moves {
+        for &(row, col) in search_moves {
             board[row][col] = player;
+            
+            // 快速获胜检查
+            if check_win(board, row, col) {
+                board[row][col] = 0;
+                return WIN_SCORE;
+            }
+            
             let eval = minimax(board, depth - 1, alpha, beta, false, player, opponent);
             board[row][col] = 0;
             max_eval = max_eval.max(eval);
             alpha = alpha.max(eval);
             if beta <= alpha {
-                break;
+                break; // Alpha-Beta剪枝
             }
         }
         max_eval
     } else {
         let mut min_eval = WIN_SCORE;
         let mut beta = beta;
-        for (row, col) in moves {
+        for &(row, col) in search_moves {
             board[row][col] = opponent;
+            
+            // 快速获胜检查
+            if check_win(board, row, col) {
+                board[row][col] = 0;
+                return LOSE_SCORE;
+            }
+            
             let eval = minimax(board, depth - 1, alpha, beta, true, player, opponent);
             board[row][col] = 0;
             min_eval = min_eval.min(eval);
             beta = beta.min(eval);
             if beta <= alpha {
-                break;
+                break; // Alpha-Beta剪枝
             }
         }
         min_eval
     }
 }
 
-// 获取最佳移动
+// 获取最佳移动（优化版）
 pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -> Option<MoveResult> {
-    println!("🤖 共享核心AI开始思考... ai_player: {}, human_player: {}", ai_player, human_player);
-    
     // 检查AI立即获胜
     for row in 0..BOARD_SIZE {
         for col in 0..BOARD_SIZE {
@@ -311,7 +333,6 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
                 let mut test_board = board.clone();
                 test_board[row][col] = ai_player;
                 if check_win(&test_board, row, col) {
-                    println!("🎯 AI立即获胜: ({}, {})", row, col);
                     return Some(MoveResult {
                         row,
                         col,
@@ -329,7 +350,6 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
                 let mut test_board = board.clone();
                 test_board[row][col] = human_player;
                 if check_win(&test_board, row, col) {
-                    println!("🛡️ 阻止对手获胜: ({}, {})", row, col);
                     return Some(MoveResult {
                         row,
                         col,
@@ -342,22 +362,25 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
     
     // 使用Minimax算法
     let moves = get_possible_moves(board);
-    println!("📋 候选移动数量: {}", moves.len());
     
     if moves.is_empty() {
-        println!("⚠️ 没有可用移动");
         return None;
     }
     
     let mut best_move = None;
     let mut best_score = LOSE_SCORE;
     
-    for (row, col) in moves {
+    // 限制搜索的移动数量，确保3秒内完成
+    let search_moves = if moves.len() > 8 {
+        &moves[..8]  // 只搜索前8个最佳候选位置
+    } else {
+        &moves
+    };
+    
+    for &(row, col) in search_moves {
         let mut test_board = board.clone();
         test_board[row][col] = ai_player;
         let score = minimax(&mut test_board, MAX_DEPTH, LOSE_SCORE, WIN_SCORE, false, ai_player, human_player);
-        
-        println!("📍 位置 ({}, {}) 得分: {}", row, col, score);
         
         if score > best_score {
             best_score = score;
@@ -367,10 +390,6 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
                 score,
             });
         }
-    }
-    
-    if let Some(ref move_result) = best_move {
-        println!("✅ 最佳移动: ({}, {}) 得分: {}", move_result.row, move_result.col, move_result.score);
     }
     
     best_move
