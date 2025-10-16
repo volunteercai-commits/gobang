@@ -21,7 +21,8 @@
   ],
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run build:wasm && react-scripts build",
+    "build:wasm": "./build-wasm.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "tauri": "tauri",

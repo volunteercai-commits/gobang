@@ -1,11 +1,14 @@
-// AI引擎 - Rust实现
-// 高性能的五子棋AI算法
+// 共享核心库 - 五子棋AI引擎
+// 平台无关的业务逻辑，可同时用于Tauri和WASM
 
-const BOARD_SIZE: usize = 15;
-const WIN_LENGTH: usize = 5;
-const MAX_DEPTH: i32 = 4;
-const WIN_SCORE: i32 = 100000;
-const LOSE_SCORE: i32 = -100000;
+use serde::{Deserialize, Serialize};
+
+// 游戏常量
+pub const BOARD_SIZE: usize = 15;
+pub const WIN_LENGTH: usize = 5;
+pub const MAX_DEPTH: i32 = 4;
+pub const WIN_SCORE: i32 = 100000;
+pub const LOSE_SCORE: i32 = -100000;
 
 // 方向向量
 const DIRECTIONS: [(i32, i32); 4] = [
@@ -15,8 +18,25 @@ const DIRECTIONS: [(i32, i32); 4] = [
     (1, -1),  // 副对角线
 ];
 
+// 游戏状态结构
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GameState {
+    pub board: Vec<Vec<i32>>,
+    pub current_player: i32,
+    pub ai_player: i32,
+    pub human_player: i32,
+}
+
+// 移动结果
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MoveResult {
+    pub row: usize,
+    pub col: usize,
+    pub score: i32,
+}
+
 // 检查位置是否有效
-fn is_valid_position(row: i32, col: i32) -> bool {
+pub fn is_valid_position(row: i32, col: i32) -> bool {
     row >= 0 && row < BOARD_SIZE as i32 && col >= 0 && col < BOARD_SIZE as i32
 }
 
@@ -145,7 +165,7 @@ pub fn evaluate_board(board: &Vec<Vec<i32>>, player: i32) -> i32 {
 }
 
 // 获取可能的移动位置
-fn get_possible_moves(board: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
+pub fn get_possible_moves(board: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
     let mut moves = Vec::new();
     
     // 检查是否为空棋盘
@@ -281,8 +301,8 @@ fn minimax(
 }
 
 // 获取最佳移动
-pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -> Option<(usize, usize)> {
-    println!("🤖 Rust AI开始思考... ai_player: {}, human_player: {}", ai_player, human_player);
+pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -> Option<MoveResult> {
+    println!("🤖 共享核心AI开始思考... ai_player: {}, human_player: {}", ai_player, human_player);
     
     // 检查AI立即获胜
     for row in 0..BOARD_SIZE {
@@ -292,7 +312,11 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
                 test_board[row][col] = ai_player;
                 if check_win(&test_board, row, col) {
                     println!("🎯 AI立即获胜: ({}, {})", row, col);
-                    return Some((row, col));
+                    return Some(MoveResult {
+                        row,
+                        col,
+                        score: WIN_SCORE,
+                    });
                 }
             }
         }
@@ -306,7 +330,11 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
                 test_board[row][col] = human_player;
                 if check_win(&test_board, row, col) {
                     println!("🛡️ 阻止对手获胜: ({}, {})", row, col);
-                    return Some((row, col));
+                    return Some(MoveResult {
+                        row,
+                        col,
+                        score: WIN_SCORE - 1,
+                    });
                 }
             }
         }
@@ -333,13 +361,52 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
         
         if score > best_score {
             best_score = score;
-            best_move = Some((row, col));
+            best_move = Some(MoveResult {
+                row,
+                col,
+                score,
+            });
         }
     }
     
-    if let Some((row, col)) = best_move {
-        println!("✅ 最佳移动: ({}, {}) 得分: {}", row, col, best_score);
+    if let Some(ref move_result) = best_move {
+        println!("✅ 最佳移动: ({}, {}) 得分: {}", move_result.row, move_result.col, move_result.score);
     }
     
     best_move
+}
+
+// 创建新的游戏状态
+pub fn create_game_state(ai_player: i32, human_player: i32) -> GameState {
+    GameState {
+        board: vec![vec![0; BOARD_SIZE]; BOARD_SIZE],
+        current_player: human_player, // 人类先手
+        ai_player,
+        human_player,
+    }
+}
+
+// 执行移动
+pub fn make_move(game_state: &mut GameState, row: usize, col: usize) -> Result<bool, String> {
+    if !is_valid_position(row as i32, col as i32) {
+        return Err("无效的位置".to_string());
+    }
+    
+    if game_state.board[row][col] != 0 {
+        return Err("位置已被占用".to_string());
+    }
+    
+    game_state.board[row][col] = game_state.current_player;
+    
+    // 检查是否获胜
+    let won = check_win(&game_state.board, row, col);
+    
+    // 切换玩家
+    game_state.current_player = if game_state.current_player == game_state.ai_player {
+        game_state.human_player
+    } else {
+        game_state.ai_player
+    };
+    
+    Ok(won)
 }
