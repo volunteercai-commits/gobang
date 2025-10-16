@@ -1,0 +1,343 @@
+{
+  "testSummary": {
+    "totalGames": 30,
+    "aiFirstGames": 15,
+    "playerFirstGames": 15,
+    "aiFirstWinRate": "0.00%",
+    "playerFirstWinRate": "0.00%",
+    "aiFirstLossRate": "0.00%",
+    "playerFirstLossRate": "0.00%",
+    "totalBugs": 0
+  },
+  "detailedResults": {
+    "aiFirst": {
+      "wins": 0,
+      "losses": 0,
+      "draws": 15
+    },
+    "playerFirst": {
+      "wins": 0,
+      "losses": 0,
+      "draws": 15
+    }
+  },
+  "bugs": [],
+  "gameLogs": [
+    {
+      "gameNumber": 1,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585787187
+        }
+      ],
+      "winner": null,
+      "duration": 1205,
+      "startTime": 1760585785986
+    },
+    {
+      "gameNumber": 2,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585790686
+        }
+      ],
+      "winner": null,
+      "duration": 2493,
+      "startTime": 1760585788198
+    },
+    {
+      "gameNumber": 3,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585792742
+        }
+      ],
+      "winner": null,
+      "duration": 1047,
+      "startTime": 1760585791700
+    },
+    {
+      "gameNumber": 4,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585795490
+        }
+      ],
+      "winner": null,
+      "duration": 1736,
+      "startTime": 1760585793757
+    },
+    {
+      "gameNumber": 5,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585798010
+        }
+      ],
+      "winner": null,
+      "duration": 1515,
+      "startTime": 1760585796499
+    },
+    {
+      "gameNumber": 6,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585801871
+        }
+      ],
+      "winner": null,
+      "duration": 2852,
+      "startTime": 1760585799025
+    },
+    {
+      "gameNumber": 7,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585804372
+        }
+      ],
+      "winner": null,
+      "duration": 1490,
+      "startTime": 1760585802886
+    },
+    {
+      "gameNumber": 8,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585807057
+        }
+      ],
+      "winner": null,
+      "duration": 1676,
+      "startTime": 1760585805384
+    },
+    {
+      "gameNumber": 9,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585810387
+        }
+      ],
+      "winner": null,
+      "duration": 2326,
+      "startTime": 1760585808067
+    },
+    {
+      "gameNumber": 10,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585812729
+        }
+      ],
+      "winner": null,
+      "duration": 1331,
+      "startTime": 1760585811402
+    },
+    {
+      "gameNumber": 11,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585814773
+        }
+      ],
+      "winner": null,
+      "duration": 1037,
+      "startTime": 1760585813740
+    },
+    {
+      "gameNumber": 12,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585817612
+        }
+      ],
+      "winner": null,
+      "duration": 1829,
+      "startTime": 1760585815786
+    },
+    {
+      "gameNumber": 13,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585821358
+        }
+      ],
+      "winner": null,
+      "duration": 2737,
+      "startTime": 1760585818623
+    },
+    {
+      "gameNumber": 14,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585823571
+        }
+      ],
+      "winner": null,
+      "duration": 1209,
+      "startTime": 1760585822367
+    },
+    {
+      "gameNumber": 15,
+      "aiFirst": true,
+      "moves": [
+        {
+          "player": "AI",
+          "time": 1760585826325
+        }
+      ],
+      "winner": null,
+      "duration": 1746,
+      "startTime": 1760585824584
+    },
+    {
+      "gameNumber": 16,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 5,
+      "startTime": 1760585827337
+    },
+    {
+      "gameNumber": 17,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 3,
+      "startTime": 1760585828351
+    },
+    {
+      "gameNumber": 18,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 4,
+      "startTime": 1760585829360
+    },
+    {
+      "gameNumber": 19,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 2,
+      "startTime": 1760585830371
+    },
+    {
+      "gameNumber": 20,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 6,
+      "startTime": 1760585831379
+    },
+    {
+      "gameNumber": 21,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 2,
+      "startTime": 1760585832393
+    },
+    {
+      "gameNumber": 22,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 2,
+      "startTime": 1760585833400
+    },
+    {
+      "gameNumber": 23,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 3,
+      "startTime": 1760585834407
+    },
+    {
+      "gameNumber": 24,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 5,
+      "startTime": 1760585835418
+    },
+    {
+      "gameNumber": 25,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 5,
+      "startTime": 1760585836430
+    },
+    {
+      "gameNumber": 26,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 7,
+      "startTime": 1760585837441
+    },
+    {
+      "gameNumber": 27,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 6,
+      "startTime": 1760585838467
+    },
+    {
+      "gameNumber": 28,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 3,
+      "startTime": 1760585839483
+    },
+    {
+      "gameNumber": 29,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 5,
+      "startTime": 1760585840492
+    },
+    {
+      "gameNumber": 30,
+      "aiFirst": false,
+      "moves": [],
+      "winner": null,
+      "duration": 6,
+      "startTime": 1760585841505
+    }
+  ],
+  "timestamp": "2025-10-16T03:37:22.520Z"
+}

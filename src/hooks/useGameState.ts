@@ -190,6 +190,8 @@ export const useGameState = () => {
       const aiEngine = new AIDecisionEngine(prevState.board, aiPlayer, humanPlayer);
       const bestMove = aiEngine.getBestMove();
       
+      console.log('🤖 AI思考中... aiPlayer:', aiPlayer, 'humanPlayer:', humanPlayer, 'bestMove:', bestMove);
+      
       if (bestMove) {
         // 直接下棋，不通过placePiece避免循环调用
         const newBoard = prevState.board.map(row => [...row]);
@@ -261,11 +263,16 @@ export const useGameState = () => {
 
   // 监听游戏状态变化，触发AI下棋
   useEffect(() => {
+    console.log('🔄 useEffect触发 - mode:', gameState.mode, 'gameEnded:', gameState.gameEnded, 'currentPlayer:', gameState.currentPlayer, 'playerIsBlack:', gameState.playerIsBlack);
+    
     if (gameState.mode === 'pvc' && !gameState.gameEnded) {
       const isAITurn = (gameState.playerIsBlack && gameState.currentPlayer === 'white') || 
                       (!gameState.playerIsBlack && gameState.currentPlayer === 'black');
       
+      console.log('🤖 AI回合检查 - isAITurn:', isAITurn, 'currentPlayer:', gameState.currentPlayer, 'playerIsBlack:', gameState.playerIsBlack);
+      
       if (isAITurn) {
+        console.log('🚀 触发AI下棋...');
         triggerAIMove();
       }
     }

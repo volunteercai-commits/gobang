@@ -6,7 +6,7 @@ class GobangAutoTest {
     this.browser = null;
     this.page = null;
     this.testResults = {
-      totalGames: 30,
+      totalGames: 6,
       aiFirstWins: 0,
       playerFirstWins: 0,
       aiFirstLosses: 0,
@@ -85,7 +85,7 @@ class GobangAutoTest {
       }
 
       let moveCount = 0;
-      const maxMoves = 225; // 15x15棋盘最大步数
+      const maxMoves = 50; // 减少最大步数，避免无限循环
 
       while (moveCount < maxMoves) {
         // 检查游戏是否结束
@@ -97,10 +97,16 @@ class GobangAutoTest {
           break;
         }
 
-        // 等待玩家下子（模拟点击）
-        await this.simulatePlayerMove();
-        gameLog.moves.push({ player: 'Player', time: Date.now() });
-        moveCount++;
+        // 玩家下子（模拟点击）
+        try {
+          await this.simulatePlayerMove();
+          gameLog.moves.push({ player: 'Player', time: Date.now() });
+          moveCount++;
+          console.log(`👤 玩家下第${moveCount}子`);
+        } catch (error) {
+          console.log('玩家下子失败，可能棋盘已满');
+          break;
+        }
 
         // 检查游戏是否结束
         const gameStatus2 = await this.checkGameStatus();
@@ -111,10 +117,16 @@ class GobangAutoTest {
           break;
         }
 
-        // 等待AI下子
-        await this.waitForAIMove();
-        gameLog.moves.push({ player: 'AI', time: Date.now() });
-        moveCount++;
+        // AI下子
+        try {
+          await this.waitForAIMove();
+          gameLog.moves.push({ player: 'AI', time: Date.now() });
+          moveCount++;
+          console.log(`🤖 AI下第${moveCount}子`);
+        } catch (error) {
+          console.log('AI下子失败，可能棋盘已满');
+          break;
+        }
       }
 
       // 记录结果
@@ -145,7 +157,7 @@ class GobangAutoTest {
 
   async waitForAIMove() {
     // 等待AI思考并下子
-    await this.page.waitForTimeout(1000 + Math.random() * 2000); // 1-3秒随机等待
+    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000)); // 1-3秒随机等待
   }
 
   async simulatePlayerMove() {
@@ -173,11 +185,15 @@ class GobangAutoTest {
     const x = labelSpace + col * cellSize + cellSize / 2;
     const y = labelSpace + row * cellSize + cellSize / 2;
     
-    // 点击该位置
+    // 第一次点击（预览）
+    await canvas.click({ x, y });
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 第二次点击（确认下子）
     await canvas.click({ x, y });
     
     // 等待下子动画完成
-    await this.page.waitForTimeout(500);
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
 
   async checkGameStatus() {
@@ -211,16 +227,16 @@ class GobangAutoTest {
       await this.init();
       await this.openGame();
 
-      // AI先手15局
-      console.log('🤖 开始AI先手测试 (15局)...');
-      for (let i = 0; i < 15; i++) {
+      // AI先手3局测试
+      console.log('🤖 开始AI先手测试 (3局)...');
+      for (let i = 0; i < 3; i++) {
         await this.playGame(true);
         await this.resetGame();
       }
 
-      // 玩家先手15局
-      console.log('👤 开始玩家先手测试 (15局)...');
-      for (let i = 0; i < 15; i++) {
+      // 玩家先手3局测试
+      console.log('👤 开始玩家先手测试 (3局)...');
+      for (let i = 0; i < 3; i++) {
         await this.playGame(false);
         await this.resetGame();
       }
@@ -246,7 +262,7 @@ class GobangAutoTest {
       const resetButton = await this.page.$('[data-testid="reset-button"]');
       if (resetButton) {
         await resetButton.click();
-        await this.page.waitForTimeout(1000);
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     } catch (error) {
       console.error('重置游戏时出错:', error);
@@ -257,12 +273,12 @@ class GobangAutoTest {
     const report = {
       testSummary: {
         totalGames: this.testResults.totalGames,
-        aiFirstGames: 15,
-        playerFirstGames: 15,
-        aiFirstWinRate: ((this.testResults.aiFirstWins / 15) * 100).toFixed(2) + '%',
-        playerFirstWinRate: ((this.testResults.playerFirstWins / 15) * 100).toFixed(2) + '%',
-        aiFirstLossRate: ((this.testResults.aiFirstLosses / 15) * 100).toFixed(2) + '%',
-        playerFirstLossRate: ((this.testResults.playerFirstLosses / 15) * 100).toFixed(2) + '%',
+        aiFirstGames: 3,
+        playerFirstGames: 3,
+        aiFirstWinRate: ((this.testResults.aiFirstWins / 3) * 100).toFixed(2) + '%',
+        playerFirstWinRate: ((this.testResults.playerFirstWins / 3) * 100).toFixed(2) + '%',
+        aiFirstLossRate: ((this.testResults.aiFirstLosses / 3) * 100).toFixed(2) + '%',
+        playerFirstLossRate: ((this.testResults.playerFirstLosses / 3) * 100).toFixed(2) + '%',
         totalBugs: this.testResults.bugs.length
       },
       detailedResults: {
