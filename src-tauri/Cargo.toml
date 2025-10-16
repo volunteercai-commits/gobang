@@ -1,6 +1,6 @@
 [package]
 name = "gobang-tauri"
-version = "3.0.0"
+version = "3.1.0"
 description = "五子棋游戏 - Tauri版本"
 authors = ["volunteercai-commits"]
 license = "MIT"
