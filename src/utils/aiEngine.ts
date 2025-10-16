@@ -317,6 +317,87 @@ export class AdvancedAIEngine {
     }
   }
 
+  // 检查威胁级别 - 新增威胁检测函数
+  static checkThreatLevel(board: PieceValue[][], row: number, col: number, player: PieceValue): number {
+    const directions: Direction[] = [
+      { dx: 0, dy: 1 },   // 横向
+      { dx: 1, dy: 0 },   // 纵向
+      { dx: 1, dy: 1 },   // 主对角线
+      { dx: 1, dy: -1 }   // 副对角线
+    ];
+
+    let maxThreat = 0;
+    for (const dir of directions) {
+      let count = 1;
+      let blocked = 0;
+      
+      // 检查正方向
+      for (let i = 1; i < 5; i++) {
+        const newRow = row + dir.dx * i;
+        const newCol = col + dir.dy * i;
+        if (!isValidPosition(newRow, newCol)) {
+          blocked++;
+          break;
+        }
+        if (board[newRow][newCol] === player) {
+          count++;
+        } else if (board[newRow][newCol] === 0) {
+          break;
+        } else {
+          blocked++;
+          break;
+        }
+      }
+
+      // 检查反方向
+      for (let i = 1; i < 5; i++) {
+        const newRow = row - dir.dx * i;
+        const newCol = col - dir.dy * i;
+        if (!isValidPosition(newRow, newCol)) {
+          blocked++;
+          break;
+        }
+        if (board[newRow][newCol] === player) {
+          count++;
+        } else if (board[newRow][newCol] === 0) {
+          break;
+        } else {
+          blocked++;
+          break;
+        }
+      }
+
+      // 威胁评分：连子数越多，威胁越大
+      if (count >= 5) maxThreat = Math.max(maxThreat, 10000); // 五连
+      else if (count === 4 && blocked === 0) maxThreat = Math.max(maxThreat, 5000); // 活四
+      else if (count === 4 && blocked === 1) maxThreat = Math.max(maxThreat, 1000); // 冲四
+      else if (count === 3 && blocked === 0) maxThreat = Math.max(maxThreat, 500);  // 活三
+      else if (count === 3 && blocked === 1) maxThreat = Math.max(maxThreat, 100);  // 眠三
+      else if (count === 2 && blocked === 0) maxThreat = Math.max(maxThreat, 50);   // 活二
+    }
+
+    return maxThreat;
+  }
+
+  // 获取所有威胁位置
+  static getThreatPositions(board: PieceValue[][], player: PieceValue): Position[] {
+    const threats: Position[] = [];
+    
+    for (let row = 0; row < 15; row++) {
+      for (let col = 0; col < 15; col++) {
+        if (board[row][col] === 0) {
+          const threatLevel = this.checkThreatLevel(board, row, col, player);
+          if (threatLevel >= 100) { // 只考虑活三以上的威胁
+            threats.push({ row, col, threatLevel } as Position & { threatLevel: number });
+          }
+        }
+      }
+    }
+    
+    // 按威胁级别排序
+    return threats.sort((a, b) => (b as any).threatLevel - (a as any).threatLevel);
+  }
+
   // 获取最佳移动
   static getBestMove(board: PieceValue[][], aiPlayer: PieceValue, humanPlayer: PieceValue): Position | null {
     // 检查开局库
@@ -328,7 +409,7 @@ export class AdvancedAIEngine {
       }
     }
 
-    // 检查立即获胜
+    // 1. 优先检查AI立即获胜
     for (let row = 0; row < 15; row++) {
       for (let col = 0; col < 15; col++) {
         if (board[row][col] === 0) {
@@ -342,7 +423,7 @@ export class AdvancedAIEngine {
       }
     }
 
-    // 检查阻止对手获胜
+    // 2. 优先检查阻止对手立即获胜
     for (let row = 0; row < 15; row++) {
       for (let col = 0; col < 15; col++) {
         if (board[row][col] === 0) {
@@ -356,7 +437,21 @@ export class AdvancedAIEngine {
       }
     }
 
-    // 使用Minimax算法
+    // 3. 检查对手的威胁，优先防守
+    const humanThreats = this.getThreatPositions(board, humanPlayer);
+    if (humanThreats.length > 0) {
+      // 优先防守最高威胁
+      return humanThreats[0];
+    }
+
+    // 4. 检查AI自己的威胁，寻找进攻机会
+    const aiThreats = this.getThreatPositions(board, aiPlayer);
+    if (aiThreats.length > 0) {
+      // 优先进攻最高威胁
+      return aiThreats[0];
+    }
+
+    // 5. 使用Minimax算法进行深度搜索
     const moves = this.getPossibleMoves(board);
     let bestMove: Position | null = null;
     let bestScore = -Infinity;
