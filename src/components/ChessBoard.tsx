@@ -82,7 +82,10 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
       for (let i = 0; i < 15; i++) {
         for (let j = 0; j < 15; j++) {
           if (gameState.board[i] && gameState.board[i][j] !== 0) {
-            drawPiece(ctx, j, i, gameState.board[i][j], offsetX, offsetY);
+            // 检查是否是最后一步的棋子
+            const isLastMove = (gameState.lastBlackMove && gameState.lastBlackMove.row === i && gameState.lastBlackMove.col === j) ||
+                              (gameState.lastWhiteMove && gameState.lastWhiteMove.row === i && gameState.lastWhiteMove.col === j);
+            drawPiece(ctx, j, i, gameState.board[i][j], offsetX, offsetY, isLastMove);
           }
         }
       }
@@ -99,7 +102,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   }, [gameState, cellSize, boardSize]);
 
   // 绘制棋子
-  const drawPiece = (ctx: CanvasRenderingContext2D, x: number, y: number, player: number, offsetX: number, offsetY: number) => {
+  const drawPiece = (ctx: CanvasRenderingContext2D, x: number, y: number, player: number, offsetX: number, offsetY: number, isLastMove: boolean = false) => {
     const centerX = offsetX + x * cellSize + cellSize / 2;
     const centerY = offsetY + y * cellSize + cellSize / 2;
     const radius = cellSize / 2 - 2;
@@ -128,6 +131,14 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     ctx.strokeStyle = player === 1 ? '#333' : '#999';
     ctx.lineWidth = 1;
     ctx.stroke();
+    
+    // 如果是最后一步，绘制标记点
+    if (isLastMove) {
+      ctx.fillStyle = player === 1 ? '#ff6b6b' : '#ff6b6b'; // 红色标记点
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
   };
 
   // 绘制预览棋子
