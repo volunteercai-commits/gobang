@@ -83,8 +83,9 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
         for (let j = 0; j < 15; j++) {
           if (gameState.board[i] && gameState.board[i][j] !== 0) {
             // 检查是否是最后一步的棋子
-            const isLastMove = (gameState.lastBlackMove && gameState.lastBlackMove.row === i && gameState.lastBlackMove.col === j) ||
-                              (gameState.lastWhiteMove && gameState.lastWhiteMove.row === i && gameState.lastWhiteMove.col === j);
+            // 根据当前玩家判断：如果当前是黑方，则最后一步是白方；如果当前是白方，则最后一步是黑方
+            const lastMove = gameState.currentPlayer === 'black' ? gameState.lastWhiteMove : gameState.lastBlackMove;
+            const isLastMove = lastMove && lastMove.row === i && lastMove.col === j;
             drawPiece(ctx, j, i, gameState.board[i][j], offsetX, offsetY, isLastMove);
           }
         }
