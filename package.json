@@ -3,6 +3,22 @@
   "version": "1.0.0",
   "description": "五子棋",
   "main": "index.js",
+  "license": "MIT",
+  "author": "volunteercai-commits",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/volunteercai-commits/gobang.git"
+  },
+  "keywords": [
+    "gobang",
+    "gomoku",
+    "five-in-a-row",
+    "react",
+    "game",
+    "ai",
+    "minimax",
+    "alpha-beta"
+  ],
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
