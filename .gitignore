@@ -51,6 +51,7 @@ src-tauri/Cargo.lock
 # WASM 构建产物
 wasm_lib/pkg/
 wasm_lib/target/
+src/wasm/
 
 # ===========================================
 # 开发工具
