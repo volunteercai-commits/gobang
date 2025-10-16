@@ -24,6 +24,7 @@ const initialGameState: GameState = {
 export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const aiThinkingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastClickTimeRef = useRef<number>(0);
 
   // 重置游戏
   const resetGame = useCallback(() => {
@@ -142,7 +143,16 @@ export const useGameState = () => {
 
   // 处理点击事件
   const handleCellClick = useCallback((row: number, col: number) => {
-    console.log('🖱️ 点击事件:', { row, col, timestamp: Date.now() });
+    const now = Date.now();
+    
+    // 防抖：防止快速重复点击
+    if (now - lastClickTimeRef.current < 200) {
+      console.log('🚫 点击防抖，忽略');
+      return;
+    }
+    lastClickTimeRef.current = now;
+    
+    console.log('🖱️ 点击事件:', { row, col, timestamp: now });
     
     setGameState(prevState => {
       if (prevState.gameEnded) return prevState;

@@ -233,12 +233,12 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
 
   // 处理触摸事件
   const handleCanvasTouch = useCallback((event: React.TouchEvent<HTMLCanvasElement>) => {
-    event.preventDefault();
+    // 不调用preventDefault，避免passive event listener警告
     if (gameState.gameEnded) return;
     
     // 防抖：防止快速重复触摸
     const now = Date.now();
-    if (now - lastTouchTimeRef.current < 300) {
+    if (now - lastTouchTimeRef.current < 500) {
       console.log('🚫 触摸防抖，忽略');
       return;
     }
