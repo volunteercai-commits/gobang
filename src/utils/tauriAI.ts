@@ -1,14 +1,16 @@
 import { invoke } from '@tauri-apps/api/core';
+import { AIDifficulty } from '../types';
 
 // Tauri AI引擎接口
 export class TauriAIEngine {
   // 调用Rust AI引擎获取最佳移动
-  static async getBestMove(board: number[][], aiPlayer: number, humanPlayer: number): Promise<{row: number, col: number} | null> {
+  static async getBestMove(board: number[][], aiPlayer: number, humanPlayer: number, difficulty: AIDifficulty = 'hard'): Promise<{row: number, col: number} | null> {
     try {
       const result = await invoke<{row: number, col: number}>('ai_move', {
         board: board,
         aiPlayer: aiPlayer,
-        humanPlayer: humanPlayer
+        humanPlayer: humanPlayer,
+        difficulty: difficulty
       });
       return result;
     } catch (error) {

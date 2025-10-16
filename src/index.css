@@ -8,16 +8,40 @@
   }
   
   html, body {
-    @apply m-0 p-0 h-full w-full;
+    @apply m-0 p-0 w-full;
+    /* 使用100vh而不是h-full，确保在移动端正确计算高度 */
+    height: 100vh;
+    height: 100dvh; /* 动态视口高度，支持移动端 */
     overflow: hidden !important;
     touch-action: manipulation;
     -webkit-touch-callout: none;
     -webkit-text-size-adjust: none;
+    /* 防止移动端缩放 */
+    -webkit-user-scalable: no;
+    user-scalable: no;
   }
   
   #root {
-    @apply h-full w-full;
+    @apply w-full;
+    height: 100vh;
+    height: 100dvh; /* 动态视口高度 */
     overflow: hidden !important;
+    /* 确保在移动端正确显示 */
+    position: relative;
+  }
+  
+  /* 移动端特殊处理 */
+  @media (max-width: 768px) {
+    html, body {
+      /* 在移动端使用更精确的高度计算 */
+      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
+    }
+    
+    #root {
+      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
+    }
   }
 }
 

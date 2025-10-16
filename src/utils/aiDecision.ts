@@ -1,4 +1,4 @@
-import { PieceValue, Position, PieceColor } from '../types';
+import { PieceValue, Position, PieceColor, AIDifficulty } from '../types';
 import { 
   isValidPosition, 
   isFirstMove, 
@@ -16,12 +16,14 @@ export class AIDecisionEngine {
   private aiPlayer: PieceValue;
   private humanPlayer: PieceValue;
   private maxTime: number;
+  private difficulty: AIDifficulty;
 
-  constructor(board: PieceValue[][], aiPlayer: PieceValue, humanPlayer: PieceValue, maxTime: number = 2000) {
+  constructor(board: PieceValue[][], aiPlayer: PieceValue, humanPlayer: PieceValue, maxTime: number = 2000, difficulty: AIDifficulty = 'hard') {
     this.board = board;
     this.aiPlayer = aiPlayer;
     this.humanPlayer = humanPlayer;
     this.maxTime = maxTime;
+    this.difficulty = difficulty;
   }
 
   // 获取AI的最佳移动 - 严格按照环境选择Rust AI引擎
@@ -48,7 +50,7 @@ export class AIDecisionEngine {
           console.log('🖥️ 桌面应用 - 调用Tauri Rust AI引擎...');
         }
         
-        const tauriMove = await TauriAIEngine.getBestMove(this.board, this.aiPlayer, this.humanPlayer);
+        const tauriMove = await TauriAIEngine.getBestMove(this.board, this.aiPlayer, this.humanPlayer, this.difficulty);
         
         if (process.env.NODE_ENV === 'development') {
           console.log('🖥️ Tauri Rust AI返回结果:', tauriMove);
@@ -80,7 +82,7 @@ export class AIDecisionEngine {
         }
         
         if (wasmAIEngine.isReady()) {
-          const wasmMove = await wasmAIEngine.getBestMove(this.board, this.aiPlayer, this.humanPlayer);
+          const wasmMove = await wasmAIEngine.getBestMove(this.board, this.aiPlayer, this.humanPlayer, this.difficulty);
           
           if (process.env.NODE_ENV === 'development') {
             console.log('🌐 WASM Rust AI返回结果:', wasmMove);

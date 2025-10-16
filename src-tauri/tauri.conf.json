@@ -9,20 +9,20 @@
     "devUrl": "http://localhost:3000",
     "frontendDist": "../build"
   },
-        "app": {
-          "windows": [
-            {
-              "fullscreen": false,
-              "resizable": true,
-              "title": "五子棋",
-              "width": 400,
-              "height": 600,
-              "minWidth": 350,
-              "minHeight": 500,
-              "maxWidth": 600,
-              "maxHeight": 800
-            }
-          ],
+  "app": {
+    "windows": [
+      {
+        "fullscreen": false,
+        "resizable": true,
+        "title": "五子棋",
+        "width": 400,
+        "height": 600,
+        "minWidth": 350,
+        "minHeight": 500,
+        "maxWidth": 600,
+        "maxHeight": 800
+      }
+    ],
     "security": {
       "csp": null
     }
@@ -38,6 +38,31 @@
       "icons/512x512.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
-  }
+    ],
+    "resources": [],
+    "externalBin": [],
+    "copyright": "Copyright © 2024 volunteercai-commits",
+    "category": "Games",
+    "shortDescription": "五子棋游戏",
+    "longDescription": "一个使用React和Rust开发的五子棋游戏，支持人机对战和人人对战。",
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.13",
+      "exceptionDomain": "localhost"
+    },
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
+    "linux": {
+      "deb": {
+        "depends": []
+      },
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    }
+  },
+  "plugins": {}
 }

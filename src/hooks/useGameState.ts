@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { GameState, Position, PieceColor, GameMode, Move } from '../types';
+import { GameState, Position, PieceColor, GameMode, Move, AIDifficulty } from '../types';
 import { initializeBoard, checkWin } from '../utils/gameLogic';
 import { AIDecisionEngine } from '../utils/aiDecision';
 
@@ -8,7 +8,7 @@ const initialGameState: GameState = {
   currentPlayer: 'black',
   gameEnded: false,
   winner: null,
-  mode: 'pvp',
+  mode: 'pvc',
   playerIsBlack: true,
   blackUndoUsed: false,
   whiteUndoUsed: false,
@@ -19,6 +19,7 @@ const initialGameState: GameState = {
   previewPosition: null,
   isPreviewMode: false,
   lastClickPosition: null,
+  aiDifficulty: 'easy' as AIDifficulty,
 };
 
 export const useGameState = () => {
@@ -217,7 +218,7 @@ export const useGameState = () => {
       const aiPlayer = prevState.playerIsBlack ? -1 : 1;
       const humanPlayer = prevState.playerIsBlack ? 1 : -1;
       
-      const aiEngine = new AIDecisionEngine(prevState.board, aiPlayer, humanPlayer);
+      const aiEngine = new AIDecisionEngine(prevState.board, aiPlayer, humanPlayer, 2000, prevState.aiDifficulty);
       // 异步调用AI引擎
       aiEngine.getBestMove().then(bestMove => {
         if (process.env.NODE_ENV === 'development') {
@@ -400,6 +401,14 @@ export const useGameState = () => {
     }));
   }, []);
 
+  // 设置AI难度
+  const setAIDifficulty = useCallback((difficulty: AIDifficulty) => {
+    setGameState(prevState => ({
+      ...prevState,
+      aiDifficulty: difficulty,
+    }));
+  }, []);
+
   return {
     gameState,
     resetGame,
@@ -411,5 +420,6 @@ export const useGameState = () => {
     triggerAIMove,
     undoMove,
     resetScores,
+    setAIDifficulty,
   };
 };

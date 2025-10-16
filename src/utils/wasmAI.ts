@@ -1,4 +1,4 @@
-import { PieceValue, Position } from '../types';
+import { PieceValue, Position, AIDifficulty } from '../types';
 
 // WASM AI引擎 - 使用共享核心的Rust代码
 export class WasmAIEngine {
@@ -58,7 +58,8 @@ export class WasmAIEngine {
   public async getBestMove(
     board: PieceValue[][], 
     aiPlayer: PieceValue, 
-    humanPlayer: PieceValue
+    humanPlayer: PieceValue,
+    difficulty: AIDifficulty = 'hard'
   ): Promise<Position | null> {
     await this.waitForInit();
     
@@ -69,7 +70,7 @@ export class WasmAIEngine {
 
     try {
       const flattenedBoard = this.flattenBoard(board);
-      const result = this.wasmModule.get_best_move_wasm(flattenedBoard, aiPlayer, humanPlayer);
+      const result = this.wasmModule.get_best_move_with_difficulty_wasm(flattenedBoard, aiPlayer, humanPlayer, difficulty);
       
       if (result) {
         return { row: result.row, col: result.col };

@@ -30,10 +30,15 @@ export const WinnerAnnouncement: React.FC<WinnerAnnouncementProps> = ({ gameStat
 
   return (
     <div 
-      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-8 py-6 rounded-2xl shadow-2xl text-2xl font-bold animate-bounce z-50" 
-      data-testid="winner-announcement"
+      className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
+      data-testid="winner-announcement-container"
     >
-      🎉 {winner}胜利！ 🎉
+      <div 
+        className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 sm:px-8 py-4 sm:py-6 rounded-2xl shadow-2xl text-lg sm:text-2xl font-bold animate-bounce pointer-events-auto"
+        data-testid="winner-announcement"
+      >
+        🎉 {winner}胜利！ 🎉
+      </div>
     </div>
   );
 };

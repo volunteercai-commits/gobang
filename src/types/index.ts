@@ -4,6 +4,9 @@ export type GameMode = 'pvp' | 'pvc';
 // 棋子颜色
 export type PieceColor = 'black' | 'white';
 
+// AI难度等级
+export type AIDifficulty = 'easy' | 'medium' | 'hard';
+
 // 棋子值
 export type PieceValue = 0 | 1 | -1; // 0: 空, 1: 黑子, -1: 白子
 
@@ -37,6 +40,7 @@ export interface GameState {
   previewPosition: Position | null;
   isPreviewMode: boolean;
   lastClickPosition: Position | null;
+  aiDifficulty: AIDifficulty;
 }
 
 // 威胁类型

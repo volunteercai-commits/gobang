@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GameState } from '../types';
+import { GameState, AIDifficulty } from '../types';
 
 interface GameControlsProps {
   gameState: GameState;
@@ -8,6 +8,7 @@ interface GameControlsProps {
   onToggleFirstPlayer: () => void;
   onUndoMove: () => void;
   onResetScores: () => void;
+  onSetAIDifficulty: (difficulty: AIDifficulty) => void;
 }
 
 export const GameControls: React.FC<GameControlsProps> = ({
@@ -17,6 +18,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
   onToggleFirstPlayer,
   onUndoMove,
   onResetScores,
+  onSetAIDifficulty,
 }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -47,13 +49,14 @@ export const GameControls: React.FC<GameControlsProps> = ({
 
   return (
     <>
-      <div className="px-4 py-2 h-16 flex items-center" data-testid="game-controls">
+      <div className="px-2 sm:px-4 py-2 h-16 sm:h-16 flex items-center" data-testid="game-controls">
         {/* 主要操作按钮 */}
-        <div className="flex gap-3 w-full">
+        <div className="flex gap-2 sm:gap-3 w-full">
           <button 
             onClick={onResetGame} 
-            className="flex-1 px-3 py-2 text-sm font-medium text-white bg-red-500 rounded-xl hover:bg-red-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-white bg-red-500 rounded-xl hover:bg-red-600 active:bg-red-700 transition-all duration-200 shadow-lg hover:shadow-xl touch-manipulation"
             data-testid="reset-button"
+            style={{ minHeight: '44px' }} // 确保触摸区域足够大
           >
             🔄 重置
           </button>
@@ -62,17 +65,19 @@ export const GameControls: React.FC<GameControlsProps> = ({
             onClick={() => {
               onUndoMove();
             }} 
-            className="flex-1 px-3 py-2 text-sm font-medium text-white bg-gray-400 rounded-xl hover:bg-gray-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-white bg-gray-400 rounded-xl hover:bg-gray-500 active:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             disabled={undoButtonState.disabled}
             data-testid="undo-button"
             title="悔棋规则：悔自己的棋子时会把对手最后下的棋子也拿掉。如果在对局中悔过棋，赢了也不得分，对方赢了得两分。"
+            style={{ minHeight: '44px' }} // 确保触摸区域足够大
           >
             ↩️ {undoButtonState.text}
           </button>
           
           <button 
             onClick={() => setIsSettingsOpen(true)} 
-            className="px-3 py-2 text-sm font-medium text-white bg-gray-600 rounded-xl hover:bg-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-white bg-gray-600 rounded-xl hover:bg-gray-700 active:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl touch-manipulation"
+            style={{ minHeight: '44px', minWidth: '44px' }} // 确保触摸区域足够大
           >
             ⚙️ 设置
           </button>
@@ -125,6 +130,38 @@ export const GameControls: React.FC<GameControlsProps> = ({
                   >
                     {gameState.playerIsBlack ? '👤 玩家先手' : '🤖 AI先手'}
                   </button>
+                </div>
+              )}
+
+              {/* AI难度设置 - 仅人机对战模式显示 */}
+              {gameState.mode === 'pvc' && (
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">AI难度</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: 'easy', label: '简单', emoji: '😊', desc: '快速思考' },
+                      { value: 'medium', label: '中等', emoji: '🤔', desc: '平衡难度' },
+                      { value: 'hard', label: '困难', emoji: '🧠', desc: '深度思考' }
+                    ].map(({ value, label, emoji, desc }) => (
+                      <button
+                        key={value}
+                        onClick={() => {
+                          onSetAIDifficulty(value as AIDifficulty);
+                          setIsSettingsOpen(false);
+                        }}
+                        className={`px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                          gameState.aiDifficulty === value
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                        data-testid={`ai-difficulty-${value}`}
+                      >
+                        <div className="text-lg mb-1">{emoji}</div>
+                        <div className="font-semibold">{label}</div>
+                        <div className="text-xs opacity-75">{desc}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 

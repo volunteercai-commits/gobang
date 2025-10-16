@@ -29,6 +29,35 @@ pub fn get_best_move_wasm(board: &[i32], ai_player: i32, human_player: i32) -> R
     }
 }
 
+// 支持难度等级的AI移动函数
+#[wasm_bindgen]
+pub fn get_best_move_with_difficulty_wasm(board: &[i32], ai_player: i32, human_player: i32, difficulty: &str) -> Result<JsValue, JsValue> {
+    // 将一维数组转换为二维数组
+    let mut board_2d = vec![vec![0; BOARD_SIZE]; BOARD_SIZE];
+    for i in 0..board.len() {
+        let row = i / BOARD_SIZE;
+        let col = i % BOARD_SIZE;
+        board_2d[row][col] = board[i];
+    }
+    
+    // 解析难度等级
+    let ai_difficulty = match difficulty {
+        "easy" => AIDifficulty::Easy,
+        "medium" => AIDifficulty::Medium,
+        "hard" => AIDifficulty::Hard,
+        _ => AIDifficulty::Easy, // 默认简单
+    };
+    
+    match get_best_move_with_difficulty(&board_2d, ai_player, human_player, ai_difficulty) {
+        Some(move_result) => {
+            let js_value = serde_wasm_bindgen::to_value(&move_result)
+                .map_err(|e| JsValue::from_str(&format!("序列化错误: {}", e)))?;
+            Ok(js_value)
+        }
+        None => Err(JsValue::from_str("AI无法找到合适的移动")),
+    }
+}
+
 // 检查获胜状态
 #[wasm_bindgen]
 pub fn check_win_wasm(board: &[i32], row: usize, col: usize) -> bool {
