@@ -15,6 +15,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   boardSize,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lastTouchTimeRef = useRef<number>(0);
 
   // 绘制棋盘
   const drawBoard = useCallback(() => {
@@ -235,6 +236,13 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     event.preventDefault();
     if (gameState.gameEnded) return;
     
+    // 防抖：防止快速重复触摸
+    const now = Date.now();
+    if (now - lastTouchTimeRef.current < 300) {
+      return;
+    }
+    lastTouchTimeRef.current = now;
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -263,6 +271,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
       return;
     }
     
+    // 触摸事件也使用相同的点击逻辑（需要点击两次）
     onCellClick(row, col);
   }, [gameState.gameEnded, boardSize, cellSize, onCellClick]);
 
