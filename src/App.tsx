@@ -69,33 +69,70 @@ function App() {
     handleCellClick(row, col);
   }, [handleCellClick]);
 
+  // 检测是否为移动端
+  const isMobile = window.innerWidth <= 768;
+
   return (
     <div className="App">
-      <div className="game-container">
-        <h1>五子棋</h1>
-        
-        <div className="chessboard-container">
-          <ChessBoard
+      {isMobile ? (
+        // 移动端 - 纯白底，无外壳
+        <div className="game-container">
+          <h1>五子棋</h1>
+          
+          <div className="chessboard-container">
+            <ChessBoard
+              gameState={gameState}
+              onCellClick={handleClick}
+              cellSize={cellSize}
+              boardSize={boardSize}
+            />
+          </div>
+          
+          <GameStatus gameState={gameState} />
+          
+          <GameControls
             gameState={gameState}
-            onCellClick={handleClick}
-            cellSize={cellSize}
-            boardSize={boardSize}
+            onResetGame={resetGame}
+            onToggleMode={toggleMode}
+            onToggleFirstPlayer={toggleFirstPlayer}
+            onUndoMove={undoMove}
+            onResetScores={resetScores}
           />
+          
+          <WinnerAnnouncement gameState={gameState} />
         </div>
-        
-        <GameStatus gameState={gameState} />
-        
-        <GameControls
-          gameState={gameState}
-          onResetGame={resetGame}
-          onToggleMode={toggleMode}
-          onToggleFirstPlayer={toggleFirstPlayer}
-          onUndoMove={undoMove}
-          onResetScores={resetScores}
-        />
-        
-        <WinnerAnnouncement gameState={gameState} />
-      </div>
+      ) : (
+        // PC端 - iPhone外壳
+        <div className="iphone-frame">
+          <div className="iphone-screen">
+            <div className="game-container">
+              <h1>五子棋</h1>
+              
+              <div className="chessboard-container">
+                <ChessBoard
+                  gameState={gameState}
+                  onCellClick={handleClick}
+                  cellSize={cellSize}
+                  boardSize={boardSize}
+                />
+              </div>
+              
+              <GameStatus gameState={gameState} />
+              
+              <GameControls
+                gameState={gameState}
+                onResetGame={resetGame}
+                onToggleMode={toggleMode}
+                onToggleFirstPlayer={toggleFirstPlayer}
+                onUndoMove={undoMove}
+                onResetScores={resetScores}
+              />
+              
+              <WinnerAnnouncement gameState={gameState} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,16 +10,66 @@ body {
   align-items: center;
   min-height: 100vh;
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   font-family: 'Arial', sans-serif;
+  overflow: hidden; /* 禁用滚动条 */
+  user-select: none; /* 禁用选择 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  touch-action: manipulation; /* 禁用缩放 */
+  -webkit-touch-callout: none; /* 禁用长按菜单 */
+  -webkit-text-size-adjust: none; /* 禁用字体缩放 */
+  -ms-text-size-adjust: none;
+  text-size-adjust: none;
 }
 
-/* 移动端优化 */
+/* iPhone外壳 - PC端 */
+@media (min-width: 769px) {
+  body {
+    background: #000000;
+    padding: 20px;
+  }
+  
+  .iphone-frame {
+    width: 375px;
+    height: 812px;
+    background: #000000;
+    border-radius: 40px;
+    padding: 8px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+  }
+  
+  .iphone-frame::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 30px;
+    background: #000000;
+    border-radius: 15px;
+    z-index: 10;
+  }
+  
+  .iphone-screen {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+  }
+}
+
+/* 移动端优化 - 纯白底 */
 @media (max-width: 768px) {
   body {
     align-items: flex-start;
-    padding: 5px;
-    padding-top: 10px;
+    padding: 0;
+    background: #ffffff;
   }
 }
 
