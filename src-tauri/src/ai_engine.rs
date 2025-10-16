@@ -147,47 +147,67 @@ pub fn evaluate_board(board: &Vec<Vec<i32>>, player: i32) -> i32 {
 // 获取可能的移动位置
 fn get_possible_moves(board: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
     let mut moves = Vec::new();
-    let search_radius = 2;
     
-    // 找到已有棋子的中心
-    let mut center_row = 7;
-    let mut center_col = 7;
-    
+    // 检查是否为空棋盘
+    let mut has_pieces = false;
     for row in 0..BOARD_SIZE {
         for col in 0..BOARD_SIZE {
             if board[row][col] != 0 {
-                center_row = row;
-                center_col = col;
+                has_pieces = true;
                 break;
             }
         }
-        if center_row != 7 { break; }
+        if has_pieces { break; }
     }
     
-    // 在中心周围搜索
+    // 如果棋盘为空，返回中心位置
+    if !has_pieces {
+        moves.push((7, 7));
+        return moves;
+    }
+    
+    // 找到所有已有棋子的位置
+    let mut piece_positions = Vec::new();
     for row in 0..BOARD_SIZE {
         for col in 0..BOARD_SIZE {
-            if board[row][col] == 0 {
-                let distance = ((row as i32 - center_row as i32).abs() + 
-                               (col as i32 - center_col as i32).abs()) as usize;
-                if distance <= search_radius {
-                    // 检查周围是否有棋子
-                    let mut has_neighbor = false;
-                    for dr in -1..=1 {
-                        for dc in -1..=1 {
-                            let new_row = row as i32 + dr;
-                            let new_col = col as i32 + dc;
-                            if is_valid_position(new_row, new_col) && 
-                               board[new_row as usize][new_col as usize] != 0 {
-                                has_neighbor = true;
-                                break;
-                            }
-                        }
-                        if has_neighbor { break; }
+            if board[row][col] != 0 {
+                piece_positions.push((row, col));
+            }
+        }
+    }
+    
+    // 为每个已有棋子周围的空位添加候选位置
+    let mut candidate_positions = std::collections::HashSet::new();
+    
+    for (piece_row, piece_col) in piece_positions {
+        for dr in -2..=2 {
+            for dc in -2..=2 {
+                let new_row = piece_row as i32 + dr;
+                let new_col = piece_col as i32 + dc;
+                
+                if is_valid_position(new_row, new_col) {
+                    let row = new_row as usize;
+                    let col = new_col as usize;
+                    
+                    if board[row][col] == 0 {
+                        candidate_positions.insert((row, col));
                     }
-                    if has_neighbor {
-                        moves.push((row, col));
-                    }
+                }
+            }
+        }
+    }
+    
+    // 将候选位置添加到移动列表
+    for (row, col) in candidate_positions {
+        moves.push((row, col));
+    }
+    
+    // 如果没有找到任何移动，返回所有空位
+    if moves.is_empty() {
+        for row in 0..BOARD_SIZE {
+            for col in 0..BOARD_SIZE {
+                if board[row][col] == 0 {
+                    moves.push((row, col));
                 }
             }
         }
@@ -262,6 +282,8 @@ fn minimax(
 
 // 获取最佳移动
 pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -> Option<(usize, usize)> {
+    println!("🤖 Rust AI开始思考... ai_player: {}, human_player: {}", ai_player, human_player);
+    
     // 检查AI立即获胜
     for row in 0..BOARD_SIZE {
         for col in 0..BOARD_SIZE {
@@ -269,6 +291,7 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
                 let mut test_board = board.clone();
                 test_board[row][col] = ai_player;
                 if check_win(&test_board, row, col) {
+                    println!("🎯 AI立即获胜: ({}, {})", row, col);
                     return Some((row, col));
                 }
             }
@@ -282,6 +305,7 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
                 let mut test_board = board.clone();
                 test_board[row][col] = human_player;
                 if check_win(&test_board, row, col) {
+                    println!("🛡️ 阻止对手获胜: ({}, {})", row, col);
                     return Some((row, col));
                 }
             }
@@ -290,6 +314,13 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
     
     // 使用Minimax算法
     let moves = get_possible_moves(board);
+    println!("📋 候选移动数量: {}", moves.len());
+    
+    if moves.is_empty() {
+        println!("⚠️ 没有可用移动");
+        return None;
+    }
+    
     let mut best_move = None;
     let mut best_score = LOSE_SCORE;
     
@@ -298,10 +329,16 @@ pub fn get_best_move(board: &Vec<Vec<i32>>, ai_player: i32, human_player: i32) -
         test_board[row][col] = ai_player;
         let score = minimax(&mut test_board, MAX_DEPTH, LOSE_SCORE, WIN_SCORE, false, ai_player, human_player);
         
+        println!("📍 位置 ({}, {}) 得分: {}", row, col, score);
+        
         if score > best_score {
             best_score = score;
             best_move = Some((row, col));
         }
+    }
+    
+    if let Some((row, col)) = best_move {
+        println!("✅ 最佳移动: ({}, {}) 得分: {}", row, col, best_score);
     }
     
     best_move

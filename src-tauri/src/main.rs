@@ -1,19 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::Manager;
-
 // AI引擎模块
 mod ai_engine;
-
-// 游戏状态结构
-#[derive(serde::Serialize, serde::Deserialize)]
-struct GameState {
-    board: Vec<Vec<i32>>,
-    current_player: String,
-    game_ended: bool,
-    winner: Option<String>,
-}
 
 // AI下棋命令
 #[tauri::command]

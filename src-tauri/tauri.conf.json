@@ -1,49 +1,41 @@
 {
+  "$schema": "https://schema.tauri.app/config/2.0.0",
+  "productName": "五子棋",
+  "version": "3.0.0",
+  "identifier": "com.volunteercai.gobang",
   "build": {
     "beforeDevCommand": "npm run start",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:3000",
-    "distDir": "../build"
+    "devUrl": "http://localhost:3000",
+    "frontendDist": "../build"
   },
-  "package": {
-    "productName": "五子棋",
-    "version": "3.0.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.volunteercai.gobang",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
-    },
+        "app": {
+          "windows": [
+            {
+              "fullscreen": false,
+              "resizable": true,
+              "title": "五子棋",
+              "width": 400,
+              "height": 600,
+              "minWidth": 350,
+              "minHeight": 500,
+              "maxWidth": 600,
+              "maxHeight": 800
+            }
+          ],
     "security": {
       "csp": null
-    },
-    "windows": [
-      {
-        "fullscreen": false,
-        "resizable": true,
-        "title": "五子棋",
-        "width": 375,
-        "height": 812,
-        "minWidth": 375,
-        "minHeight": 812,
-        "maxWidth": 375,
-        "maxHeight": 812
-      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ]
   }
 }

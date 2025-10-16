@@ -4,7 +4,6 @@ import { GameControls } from './components/GameControls';
 import { GameStatus } from './components/GameStatus';
 import { WinnerAnnouncement } from './components/WinnerAnnouncement';
 import { useGameState } from './hooks/useGameState';
-import './styles/App.css';
 
 function App() {
   const {
@@ -22,25 +21,26 @@ function App() {
   const [boardSize, setBoardSize] = useState(450);
   const [cellSize, setCellSize] = useState(30);
 
-  // 调整棋盘大小
+  // 调整棋盘大小 - 确保无滚动条
   const resizeBoard = useCallback(() => {
-    const container = document.querySelector('.chessboard-container') as HTMLElement;
-    if (!container) return;
-
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
     
-    // 计算合适的棋盘大小
-    let maxSize;
-    if (window.innerWidth <= 768) {
-      // 移动端 - 利用更紧凑的坐标空间，让棋盘更大
-      maxSize = Math.min(containerWidth, containerHeight, window.innerWidth * 0.85, window.innerHeight * 0.65);
-    } else {
-      // 桌面端
-      maxSize = Math.min(containerWidth, containerHeight, 500);
-    }
+    // 计算可用空间
+    const headerHeight = 60; // 标题区域
+    const statusHeight = 80; // 状态栏
+    const controlsHeight = 80; // 控制按钮
+    const padding = 32; // 内边距
     
-    const newSize = Math.max(300, Math.min(maxSize, window.innerWidth <= 768 ? 400 : 500));
+    const availableHeight = windowHeight - headerHeight - statusHeight - controlsHeight - padding;
+    const availableWidth = windowWidth - padding;
+    
+    // 计算最大棋盘尺寸
+    const maxSize = Math.min(availableWidth, availableHeight);
+    
+    // 确保最小尺寸，最大尺寸
+    const newSize = Math.max(250, Math.min(maxSize, windowWidth <= 768 ? 300 : 400));
+    
     setBoardSize(newSize);
     setCellSize(newSize / 15);
   }, []);
@@ -69,27 +69,32 @@ function App() {
     handleCellClick(row, col);
   }, [handleCellClick]);
 
-  // 检测是否为移动端
-  const isMobile = window.innerWidth <= 768;
-
   return (
-    <div className="App">
-      {isMobile ? (
-        // 移动端 - 纯白底，无外壳
-        <div className="game-container">
-          <h1>五子棋</h1>
-          
-          <div className="chessboard-container">
-            <ChessBoard
-              gameState={gameState}
-              onCellClick={handleClick}
-              cellSize={cellSize}
-              boardSize={boardSize}
-            />
-          </div>
-          
+    <div className="w-full h-screen bg-white overflow-hidden">
+      {/* 统一的多端设计 - 固定高度，无滚动条 */}
+      <div className="w-full h-full flex flex-col bg-white">
+        {/* 标题区域 - 固定高度 */}
+        <div className="flex-shrink-0 px-4 py-2">
+          <h1 className="text-center text-xl font-bold text-black">五子棋</h1>
+        </div>
+        
+        {/* 棋盘区域 - 自适应高度 */}
+        <div className="flex-1 flex justify-center items-center px-4 min-h-0">
+          <ChessBoard
+            gameState={gameState}
+            onCellClick={handleClick}
+            cellSize={cellSize}
+            boardSize={boardSize}
+          />
+        </div>
+        
+        {/* 状态栏 - 固定高度 */}
+        <div className="flex-shrink-0">
           <GameStatus gameState={gameState} />
-          
+        </div>
+        
+        {/* 控制按钮 - 固定高度 */}
+        <div className="flex-shrink-0">
           <GameControls
             gameState={gameState}
             onResetGame={resetGame}
@@ -98,41 +103,11 @@ function App() {
             onUndoMove={undoMove}
             onResetScores={resetScores}
           />
-          
-          <WinnerAnnouncement gameState={gameState} />
         </div>
-      ) : (
-        // PC端 - iPhone外壳
-        <div className="iphone-frame">
-          <div className="iphone-screen">
-            <div className="game-container">
-              <h1>五子棋</h1>
-              
-              <div className="chessboard-container">
-                <ChessBoard
-                  gameState={gameState}
-                  onCellClick={handleClick}
-                  cellSize={cellSize}
-                  boardSize={boardSize}
-                />
-              </div>
-              
-              <GameStatus gameState={gameState} />
-              
-              <GameControls
-                gameState={gameState}
-                onResetGame={resetGame}
-                onToggleMode={toggleMode}
-                onToggleFirstPlayer={toggleFirstPlayer}
-                onUndoMove={undoMove}
-                onResetScores={resetScores}
-              />
-              
-              <WinnerAnnouncement gameState={gameState} />
-            </div>
-          </div>
-        </div>
-      )}
+        
+        {/* 胜利提示 - 绝对定位，不影响布局 */}
+        <WinnerAnnouncement gameState={gameState} />
+      </div>
     </div>
   );
 }

@@ -228,6 +228,17 @@ export const useGameState = () => {
           setGameState(currentState => {
             if (currentState.gameEnded || currentState.mode === 'pvp') return currentState;
             
+            // 检查是否还是AI的回合（防止重复下棋）
+            const isStillAITurn = (currentState.playerIsBlack && currentState.currentPlayer === 'white') || 
+                                 (!currentState.playerIsBlack && currentState.currentPlayer === 'black');
+            
+            if (!isStillAITurn) {
+              if (process.env.NODE_ENV === 'development') {
+                console.log('⚠️ AI回合已结束，跳过下棋');
+              }
+              return currentState;
+            }
+            
             // 直接下棋
             const newBoard = currentState.board.map(row => [...row]);
             newBoard[bestMove.row][bestMove.col] = aiPlayer;
@@ -261,8 +272,18 @@ export const useGameState = () => {
               }
             }
 
+            // 切换玩家（除非游戏结束）
             const newCurrentPlayer = isWin ? currentState.currentPlayer : 
                                     (currentState.currentPlayer === 'black' ? 'white' : 'black');
+
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🤖 AI下棋完成:', {
+                position: bestMove,
+                player: currentState.currentPlayer,
+                isWin: isWin,
+                nextPlayer: newCurrentPlayer
+              });
+            }
 
             return {
               ...currentState,

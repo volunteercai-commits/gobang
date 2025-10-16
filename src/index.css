@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply select-none;
+  }
+  
+  html, body {
+    @apply m-0 p-0 h-full w-full;
+    overflow: hidden !important;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: none;
+  }
+  
+  #root {
+    @apply h-full w-full;
+    overflow: hidden !important;
+  }
+}
+

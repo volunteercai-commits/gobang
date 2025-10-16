@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI检查</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white">
+    <div class="min-h-screen bg-white">
+        <div class="w-full h-screen flex flex-col bg-white">
+            <h1 class="text-center text-2xl font-bold text-black py-4">五子棋</h1>
+            
+            <!-- 棋盘区域 -->
+            <div class="flex-1 flex justify-center items-center px-4">
+                <div class="w-80 h-80 bg-amber-100 border-2 border-amber-300 rounded-lg flex items-center justify-center">
+                    <div class="text-gray-600">棋盘区域</div>
+                </div>
+            </div>
+            
+            <!-- 状态栏 -->
+            <div class="px-4 py-2">
+                <div class="bg-gradient-to-r from-pink-300 to-teal-300 text-black px-4 py-3 rounded-lg text-center font-medium mb-2">
+                    轮到您下棋 (黑子)
+                </div>
+                
+                <div class="flex justify-center gap-8 bg-gray-100 px-4 py-2 rounded-lg">
+                    <div class="text-center">
+                        <div class="text-gray-600 text-sm">玩家</div>
+                        <div class="text-blue-600 font-bold text-lg">0</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-gray-600 text-sm">AI</div>
+                        <div class="text-blue-600 font-bold text-lg">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 按钮区域 -->
+            <div class="px-4 py-2">
+                <div class="space-y-2">
+                    <!-- 第一行 -->
+                    <div class="flex gap-2">
+                        <button class="flex-1 px-3 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors">
+                            重置游戏
+                        </button>
+                        
+                        <button class="flex-1 px-3 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors">
+                            人机对战
+                        </button>
+                        
+                        <button class="flex-1 px-3 py-2 text-sm font-medium text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition-colors">
+                            先手：玩家
+                        </button>
+                    </div>
+                    
+                    <!-- 第二行 -->
+                    <div class="flex gap-2">
+                        <button class="flex-1 px-3 py-2 text-sm font-medium text-white bg-gray-400 rounded-lg hover:bg-gray-500 transition-colors">
+                            悔棋 (黑方无子)
+                        </button>
+                        
+                        <button class="flex-1 px-3 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors">
+                            重置分数
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

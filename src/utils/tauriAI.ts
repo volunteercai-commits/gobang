@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 // Tauri AI引擎接口
 export class TauriAIEngine {
@@ -49,5 +49,5 @@ export class TauriAIEngine {
 
 // 检测是否在Tauri环境中
 export function isTauriEnvironment(): boolean {
-  return typeof window !== 'undefined' && window.__TAURI__ !== undefined;
+  return typeof window !== 'undefined' && (window as any).__TAURI__ !== undefined;
 }

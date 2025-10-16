@@ -193,11 +193,11 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
-    // 绘制数字坐标 (1-15) 在左侧
+    // 绘制数字坐标 (1-15) 在左侧，从下到上
     for (let i = 0; i < 15; i++) {
       const x = offsetX - cellSize / 2.5;
       const y = offsetY + i * cellSize + cellSize / 2;
-      ctx.fillText((i + 1).toString(), x, y);
+      ctx.fillText((15 - i).toString(), x, y);
     }
     
     // 绘制字母坐标 (A-O) 在底部
@@ -240,6 +240,8 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
       return;
     }
     
+    // 坐标转换：显示坐标从下到上1-15，但数组索引从上到下0-14
+    // 所以row保持不变，因为数组索引和显示坐标是一致的
     onCellClick(row, col);
   }, [gameState.gameEnded, boardSize, cellSize, onCellClick]);
 
@@ -290,7 +292,8 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
       return;
     }
     
-    // 触摸事件也使用相同的点击逻辑（需要点击两次）
+    // 坐标转换：显示坐标从下到上1-15，但数组索引从上到下0-14
+    // 所以row保持不变，因为数组索引和显示坐标是一致的
     onCellClick(row, col);
   }, [gameState.gameEnded, boardSize, cellSize, onCellClick]);
 
