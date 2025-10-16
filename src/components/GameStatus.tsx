@@ -25,20 +25,38 @@ export const GameStatus: React.FC<GameStatusProps> = ({ gameState }) => {
   };
 
   return (
-    <div className="game-status">
-      <div className="status">
+    <div className="px-4 py-2 h-20 flex flex-col justify-center">
+      <div 
+        className="bg-gradient-to-r from-pink-300 to-teal-300 text-black px-4 py-2 rounded-lg text-center font-medium text-sm"
+        style={{ 
+          background: 'linear-gradient(to right, #f9a8d4, #6ee7b7)',
+          color: 'black',
+          borderRadius: '8px',
+          textAlign: 'center',
+          fontWeight: '500'
+        }}
+      >
         {getStatusText()}
       </div>
       
       {gameState.mode === 'pvc' && (
-        <div className="score-display">
-          <div className="score-item">
-            <span className="score-label">玩家:</span>
-            <span className="score-value">{gameState.playerScore}</span>
+        <div 
+          className="flex justify-center gap-6 bg-gray-100 px-4 py-1 rounded-lg mt-1"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '24px',
+            backgroundColor: '#f3f4f6',
+            borderRadius: '8px'
+          }}
+        >
+          <div className="text-center" style={{ textAlign: 'center' }}>
+            <div className="text-gray-600 text-xs" style={{ color: '#6b7280', fontSize: '12px' }}>玩家</div>
+            <div className="text-blue-600 font-bold text-base" style={{ color: '#2563eb', fontWeight: 'bold', fontSize: '16px' }}>{gameState.playerScore}</div>
           </div>
-          <div className="score-item">
-            <span className="score-label">AI:</span>
-            <span className="score-value">{gameState.aiScore}</span>
+          <div className="text-center" style={{ textAlign: 'center' }}>
+            <div className="text-gray-600 text-xs" style={{ color: '#6b7280', fontSize: '12px' }}>AI</div>
+            <div className="text-blue-600 font-bold text-base" style={{ color: '#2563eb', fontWeight: 'bold', fontSize: '16px' }}>{gameState.aiScore}</div>
           </div>
         </div>
       )}

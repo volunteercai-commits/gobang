@@ -1,0 +1,24 @@
+[package]
+name = "gobang-tauri"
+version = "3.0.0"
+description = "五子棋游戏 - Tauri版本"
+authors = ["volunteercai-commits"]
+license = "MIT"
+repository = "https://github.com/volunteercai-commits/gobang.git"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0", features = [] }
+shared_core = { path = "../shared_core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]
